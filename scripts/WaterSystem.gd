@@ -9,7 +9,7 @@ var water_clean := 2.0   # litres de départ
 
 func _process(delta: float) -> void:
     if weather and weather.profile.get("rain", 0.0) > 0.1:
-        var coef := weather.profile.rain # 0..1
+        var coef: float = weather.profile.rain # 0..1
         water_raw += collector_rate * coef * delta
 
 func can_filter_1l() -> bool:

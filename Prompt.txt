@@ -1,0 +1,218 @@
+PR suivante : Core Gameplay Pack 1 (HUD + Player + Eau)
+
+Colle ce prompt à ton MCP (branche feat/core-gameplay-1).
+
+🎯 Objectif
+
+Rendre le MVP jouable : déplacements, HUD des jauges, collecte d’eau de pluie → eau potable, sauvegarde simple.
+
+✅ Tâches
+
+Input Map (si absent)
+
+Actions: ui_up, ui_down, ui_left, ui_right mappées à Z/Q/S/D (et flèches).
+
+Player
+
+Ajouter scenes/Player.tscn (CharacterBody3D + capsule MeshInstance3D + CollisionShape3D) utilisant scripts/Player.gd.
+
+Ajouter un spawner dans scenes/world/Roof.tscn (Node SpawnPoint à (0,0,0)) et instancier Player.tscn dans Main.tscn au ready.
+
+HUD
+
+Créer scripts/HUD.gd et connecter à Stats pour afficher : faim, soif, énergie, température.
+
+scenes/ui/HUD.tscn : CanvasLayer > Control avec 4 ProgressBar nommées PBHunger, PBThirst, PBEnergy, PBTemp + labels.
+
+Système Eau
+
+Nouveau script scripts/WaterSystem.gd : variables water_raw (L), water_clean (L), collector_rate (L/s), logique de collecte si Weather.profile.rain > 0.1.
+
+Recette « bouillir » : consomme water_raw + energy (ou charcoal) et produit water_clean.
+
+Petite UI craft/convert dans HUD (bouton « Filtrer 1L » si ressources ok).
+
+Sauvegarde
+
+Étendre SaveLoad.gd pour enregistrer Stats, WaterSystem, Inventory.
+
+Raccourcis: F5 = save, F9 = load.
+
+Docs
+
+Mettre à jour README (captures à venir).
+
+📁 Nouveaux/Modifiés
+
+scenes/Player.tscn (minimal)
+
+[gd_scene format=3]
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("res://scripts/Player.gd")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = CapsuleShape3D { radius = 0.4, height = 1.6 }
+
+scripts/Player.gd (ajout rotation caméra optionnelle plus tard)
+
+extends CharacterBody3D
+class_name Player
+
+@export var speed := 5.0
+
+func _physics_process(delta: float) -> void:
+    var dir := Vector3.ZERO
+    if Input.is_action_pressed("ui_up"): dir.z -= 1
+    if Input.is_action_pressed("ui_down"): dir.z += 1
+    if Input.is_action_pressed("ui_left"): dir.x -= 1
+    if Input.is_action_pressed("ui_right"): dir.x += 1
+    if dir.length() > 0:
+        dir = dir.normalized()
+    velocity.x = dir.x * speed
+    velocity.z = dir.z * speed
+    move_and_slide()
+
+scripts/HUD.gd
+
+extends CanvasLayer
+class_name HUD
+
+@onready var pb_hunger: ProgressBar = $Control/PBHunger
+@onready var pb_thirst: ProgressBar = $Control/PBThirst
+@onready var pb_energy: ProgressBar = $Control/PBEnergy
+@onready var pb_temp: ProgressBar = $Control/PBTemp
+
+var stats: Stats
+
+func _ready() -> void:
+    stats = get_tree().get_first_node_in_group("stats") as Stats
+
+func _process(delta: float) -> void:
+    if stats == null: return
+    pb_hunger.value = stats.hunger
+    pb_thirst.value = stats.thirst
+    pb_energy.value = stats.energy
+    pb_temp.value = clamp((stats.body_temp - 34.0) * 33.3, 0.0, 100.0) # 34-37°C
+
+Dans scenes/Main.tscn, ajoute Stats au groupe stats (editor ou code).
+
+scripts/WaterSystem.gd
+
+extends Node
+class_name WaterSystem
+
+var water_raw := 0.0     # litres
+var water_clean := 2.0   # litres de départ
+@export var collector_rate := 0.02  # L/s par pluie modérée
+@onready var weather: Weather = get_node("../Weather")
+@onready var inventory: Inventory = get_node("../Inventory")
+
+func _process(delta: float) -> void:
+    if weather and weather.profile.get("rain", 0.0) > 0.1:
+        var coef := weather.profile.rain # 0..1
+        water_raw += collector_rate * coef * delta
+
+func can_filter_1l() -> bool:
+    return water_raw >= 1.0 and inventory.has("charcoal", 1)
+
+func filter_1l() -> bool:
+    if !can_filter_1l():
+        return false
+    water_raw -= 1.0
+    water_clean += 1.0
+    inventory.remove("charcoal", 1)
+    return true
+
+scripts/Stats.gd (mini ajustements)
+
+extends Node
+class_name Stats
+
+group = "stats"
+
+var hunger := 0.0
+var thirst := 0.0
+var energy := 100.0
+var body_temp := 36.8
+
+const HUNGER_RATE := 0.20
+const THIRST_RATE := 0.35
+const ENERGY_REGEN := 15.0
+
+func _process(delta: float) -> void:
+    hunger = clamp(hunger + HUNGER_RATE * delta, 0.0, 100.0)
+    thirst = clamp(thirst + THIRST_RATE * delta, 0.0, 100.0)
+    energy = clamp(energy + (ENERGY_REGEN * 0.1) * delta, 0.0, 100.0)
+
+scenes/Main.tscn (ajouts logiques)
+
+[node name="WaterSystem" type="Node" parent="."]
+script = ExtResource("res://scripts/WaterSystem.gd")
+[node name="HUD" parent="." instance=ExtResource("res://scenes/ui/HUD.tscn")]
+
+scripts/SaveLoad.gd (bind touches et sérialisation)
+
+extends Node
+class_name SaveLoad
+
+@onready var stats: Stats = get_node("../Stats")
+@onready var inv: Inventory = get_node("../Inventory")
+@onready var water: WaterSystem = get_node("../WaterSystem")
+
+func _unhandled_input(event: InputEvent) -> void:
+    if event.is_action_pressed("save"): save_state(_snapshot())
+    if event.is_action_pressed("load"): _apply(load_state())
+
+func _snapshot() -> Dictionary:
+    return {
+        "stats": {"hunger":stats.hunger,"thirst":stats.thirst,"energy":stats.energy,"body_temp":stats.body_temp},
+        "inv": inv.items,
+        "water": {"raw": water.water_raw, "clean": water.water_clean}
+    }
+
+func _apply(s: Dictionary) -> void:
+    if s.has("stats"):
+        var st = s.stats
+        stats.hunger = st.hunger
+        stats.thirst = st.thirst
+        stats.energy = st.energy
+        stats.body_temp = st.body_temp
+    if s.has("inv"): inv.items = s.inv
+    if s.has("water"):
+        water.water_raw = s.water.raw
+        water.water_clean = s.water.clean
+
+Mapping entrée additionnel (à ajouter au projet)
+
+save → F5
+
+load → F9
+
+🧪 Critères d’acceptation
+
+Le joueur se déplace sur le toit (ZQSD + flèches).
+
+Le HUD affiche des jauges qui évoluent dans le temps.
+
+Quand il pleut (profile rain), water_raw augmente.
+
+Bouton dans le HUD appelle WaterSystem.filter_1l() si ressources ok et augmente water_clean.
+
+F5 sauvegarde, F9 recharge (jauges, inventaire, eau).
+
+🔀 Git
+
+Branche: feat/core-gameplay-1
+
+Commits:
+
+feat: add player scene and movement
+
+feat: add HUD with survival gauges
+
+feat: implement WaterSystem (rain collection + filtering)
+
+feat: save/load snapshot (stats, inventory, water)
+
+docs: update README with run & controls
+
+Ouvrir PR vers main — titre: Core gameplay pack 1.

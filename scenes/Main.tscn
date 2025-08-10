@@ -1,12 +1,13 @@
-[gd_scene load_steps=8 format=3 uid="uid://d0eo0vykvdqt2"]
+[gd_scene load_steps=9 format=3 uid="uid://d0eo0vykvdqt2"]
 
-[ext_resource type="Script" path="res://scripts/Stats.gd" id="1_7h1vh"]
-[ext_resource type="Script" path="res://scripts/Weather.gd" id="2_1xh2c"]
-[ext_resource type="Script" path="res://scripts/Inventory.gd" id="3_8xv4d"]
-[ext_resource type="Script" path="res://scripts/Crafting.gd" id="4_m7x8e"]
-[ext_resource type="Script" path="res://scripts/WaterSystem.gd" id="5_x9m2r"]
+[ext_resource type="Script" uid="uid://cf00cuj8v7kqq" path="res://scripts/Stats.gd" id="1_7h1vh"]
+[ext_resource type="Script" uid="uid://db7h6g6n6wh0d" path="res://scripts/Weather.gd" id="2_1xh2c"]
+[ext_resource type="Script" uid="uid://bt6ww5ornde67" path="res://scripts/Inventory.gd" id="3_8xv4d"]
+[ext_resource type="Script" uid="uid://lnrx42hq04kk" path="res://scripts/Crafting.gd" id="4_m7x8e"]
+[ext_resource type="Script" uid="uid://qh51eiql3ihe" path="res://scripts/WaterSystem.gd" id="5_x9m2r"]
 [ext_resource type="PackedScene" uid="uid://cls8xr2m5r2qb" path="res://scenes/ui/HUD.tscn" id="6_8v4x2"]
-[ext_resource type="Script" path="res://scripts/GameManager.gd" id="7_9k3l1"]
+[ext_resource type="Script" uid="uid://c3r2533wj6g37" path="res://scripts/GameManager.gd" id="7_9k3l1"]
+[ext_resource type="Script" uid="uid://hge4p1q7f2r4" path="res://scripts/SaveLoad.gd" id="8_5t6w9"]
 
 [node name="Main" type="Node"]
 
@@ -29,6 +30,6 @@ script = ExtResource("4_m7x8e")
 script = ExtResource("5_x9m2r")
 
 [node name="SaveLoad" type="Node" parent="."]
-script = ExtResource("res://scripts/SaveLoad.gd")
+script = ExtResource("8_5t6w9")
 
 [node name="HUD" parent="." instance=ExtResource("6_8v4x2")]
