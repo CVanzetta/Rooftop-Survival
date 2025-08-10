@@ -1,3 +1,93 @@
-[gd_scene load_steps=1 format=3 uid="uid://cls8xr2m5r2qb"]
+[gd_scene load_steps=2 format=3 uid="uid://cls8xr2m5r2qb"]
+
+[ext_resource type="Script" path="res://scripts/HUD.gd" id="1_8v4x2"]
 
 [node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_8v4x2")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -200.0
+offset_right = 300.0
+offset_bottom = -20.0
+
+[node name="HBoxHunger" type="HBoxContainer" parent="Control/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Control/VBoxContainer/HBoxHunger"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Faim:"
+
+[node name="PBHunger" type="ProgressBar" parent="Control/VBoxContainer/HBoxHunger"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 100.0
+step = 0.1
+show_percentage = false
+
+[node name="HBoxThirst" type="HBoxContainer" parent="Control/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Control/VBoxContainer/HBoxThirst"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Soif:"
+
+[node name="PBThirst" type="ProgressBar" parent="Control/VBoxContainer/HBoxThirst"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 100.0
+step = 0.1
+show_percentage = false
+
+[node name="HBoxEnergy" type="HBoxContainer" parent="Control/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Control/VBoxContainer/HBoxEnergy"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Énergie:"
+
+[node name="PBEnergy" type="ProgressBar" parent="Control/VBoxContainer/HBoxEnergy"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 100.0
+step = 0.1
+show_percentage = false
+
+[node name="HBoxTemp" type="HBoxContainer" parent="Control/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Control/VBoxContainer/HBoxTemp"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Temp:"
+
+[node name="PBTemp" type="ProgressBar" parent="Control/VBoxContainer/HBoxTemp"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 100.0
+step = 0.1
+show_percentage = false
+
+[node name="HSeparator" type="HSeparator" parent="Control/VBoxContainer"]
+layout_mode = 2
+
+[node name="LblWater" type="Label" parent="Control/VBoxContainer"]
+layout_mode = 2
+text = "Eau: 0.0L brute / 2.0L propre"
+
+[node name="BtnFilter" type="Button" parent="Control/VBoxContainer"]
+layout_mode = 2
+text = "Filtrer 1L"
