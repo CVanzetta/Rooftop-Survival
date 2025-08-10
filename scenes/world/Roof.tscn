@@ -1,0 +1,3 @@
+[gd_scene load_steps=1 format=3 uid="uid://biqkxc6o2xegw"]
+
+[node name="Roof" type="StaticBody3D"]

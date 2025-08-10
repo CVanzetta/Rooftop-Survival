@@ -1,0 +1,8 @@
+{
+  "benches": ["t1"],
+  "recipes": [
+    { "id": "water_filter_t1", "bench": "t1", "in": { "scrap": 10, "charcoal": 4 }, "out": { "filter_t1": 1 } },
+    { "id": "rain_collector",   "bench": "t1", "in": { "scrap": 20, "plastic": 8 }, "out": { "collector_t1": 1 } },
+    { "id": "bed_basic",        "bench": "t1", "in": { "textile": 6, "scrap": 8 },  "out": { "bed_basic": 1 } }
+  ]
+}

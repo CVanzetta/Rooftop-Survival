@@ -1,0 +1,20 @@
+[gd_scene load_steps=5 format=3 uid="uid://d0eo0vykvdqt2"]
+
+[ext_resource type="Script" path="res://scripts/Stats.gd" id="1_7h1vh"]
+[ext_resource type="Script" path="res://scripts/Weather.gd" id="2_1xh2c"]
+[ext_resource type="Script" path="res://scripts/Inventory.gd" id="3_8xv4d"]
+[ext_resource type="Script" path="res://scripts/Crafting.gd" id="4_m7x8e"]
+
+[node name="Main" type="Node"]
+
+[node name="Stats" type="Node" parent="."]
+script = ExtResource("1_7h1vh")
+
+[node name="Weather" type="Node" parent="."]
+script = ExtResource("2_1xh2c")
+
+[node name="Inventory" type="Node" parent="."]
+script = ExtResource("3_8xv4d")
+
+[node name="Crafting" type="Node" parent="."]
+script = ExtResource("4_m7x8e")
