@@ -1,3 +1,18 @@
-[gd_scene load_steps=1 format=3 uid="uid://biqkxc6o2xegw"]
+[gd_scene load_steps=3 format=3 uid="uid://biqkxc6o2xegw"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_1q7x8"]
+size = Vector3(10, 0.2, 10)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1v9m2"]
+size = Vector3(10, 0.2, 10)
 
 [node name="Roof" type="StaticBody3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_1q7x8")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_1v9m2")
+
+[node name="SpawnPoint" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
