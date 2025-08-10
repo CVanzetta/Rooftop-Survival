@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://d0eo0vykvdqt2"]
+[gd_scene load_steps=9 format=3 uid="uid://d0eo0vykvdqt2"]
 
 [ext_resource type="Script" path="res://scripts/Stats.gd" id="1_7h1vh"]
 [ext_resource type="Script" path="res://scripts/Weather.gd" id="2_1xh2c"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://scripts/WaterSystem.gd" id="5_x9m2r"]
 [ext_resource type="PackedScene" uid="uid://cls8xr2m5r2qb" path="res://scenes/ui/HUD.tscn" id="6_8v4x2"]
 [ext_resource type="Script" path="res://scripts/GameManager.gd" id="7_9k3l1"]
+[ext_resource type="Script" path="res://scripts/SaveLoad.gd" id="8_5t6w9"]
 
 [node name="Main" type="Node"]
 
@@ -29,6 +30,6 @@ script = ExtResource("4_m7x8e")
 script = ExtResource("5_x9m2r")
 
 [node name="SaveLoad" type="Node" parent="."]
-script = ExtResource("res://scripts/SaveLoad.gd")
+script = ExtResource("8_5t6w9")
 
 [node name="HUD" parent="." instance=ExtResource("6_8v4x2")]
