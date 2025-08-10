@@ -1,0 +1,10 @@
+; Engine configuration file.
+; Format: 2
+config_version=5
+
+[application]
+config/name="Rooftop Survival"
+run/main_scene="res://scenes/Main.tscn"
+
+[rendering]
+renderer/rendering_method="forward_plus"
