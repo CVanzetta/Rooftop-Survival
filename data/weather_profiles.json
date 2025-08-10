@@ -1,0 +1,8 @@
+{
+  "profiles": [
+    { "id": "overcast", "temp": 15, "rain": 0.2, "wind": 0.3, "light": 0.6 },
+    { "id": "rain",     "temp": 12, "rain": 0.9, "wind": 0.5, "light": 0.4 },
+    { "id": "clear",    "temp": 18, "rain": 0.0, "wind": 0.2, "light": 1.0 }
+  ],
+  "transition_minutes": 20
+}
