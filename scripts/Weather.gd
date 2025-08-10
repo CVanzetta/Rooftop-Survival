@@ -12,7 +12,7 @@ var transition_minutes := 20
 func _ready() -> void:
     var f := FileAccess.open("res://data/weather_profiles.json", FileAccess.READ)
     if f:
-        var j = JSON.parse_string(f.get_as_text())
+        var j: Variant = JSON.parse_string(f.get_as_text())
         profiles = j.get("profiles", [])
         transition_minutes = j.get("transition_minutes", 20)
         _pick_new_target()
@@ -20,7 +20,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
     if transition_time < transition_total:
         transition_time += delta
-        var t := clamp(transition_time/transition_total, 0.0, 1.0)
+        var t: float = clamp(transition_time/transition_total, 0.0, 1.0)
         profile.temp = lerp(profile.temp, target_profile.temp, t)
         profile.rain = lerp(profile.rain, target_profile.rain, t)
         profile.wind = lerp(profile.wind, target_profile.wind, t)

@@ -25,7 +25,7 @@ func _apply(s: Dictionary) -> void:
         print("Aucune sauvegarde trouvée!")
         return
     if s.has("stats"):
-        var st = s.stats
+        var st: Variant = s.stats
         stats.hunger = st.hunger
         stats.thirst = st.thirst
         stats.energy = st.energy
@@ -36,10 +36,10 @@ func _apply(s: Dictionary) -> void:
         water.water_clean = s.water.clean
 
 func save_state(state: Dictionary) -> void:
-    var f = FileAccess.open("user://save.json", FileAccess.WRITE)
+    var f: FileAccess = FileAccess.open("user://save.json", FileAccess.WRITE)
     f.store_string(JSON.stringify(state))
 
 func load_state() -> Dictionary:
     if !FileAccess.file_exists("user://save.json"): return {}
-    var f = FileAccess.open("user://save.json", FileAccess.READ)
+    var f: FileAccess = FileAccess.open("user://save.json", FileAccess.READ)
     return JSON.parse_string(f.get_as_text())

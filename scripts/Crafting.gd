@@ -7,13 +7,13 @@ var recipes := []
 func _ready() -> void:
     var f := FileAccess.open("res://data/recipes.json", FileAccess.READ)
     if f:
-        var j = JSON.parse_string(f.get_as_text())
+        var j: Variant = JSON.parse_string(f.get_as_text())
         recipes = j.get("recipes", [])
 
 func craft(id: String) -> bool:
-    var r = recipes.filter(func(x): return x.id == id)
+    var r: Array = recipes.filter(func(x): return x.id == id)
     if r.size() == 0: return false
-    var recipe = r[0]
+    var recipe: Variant = r[0]
     for k in recipe.in.keys():
         if !inventory.has(k, int(recipe.in[k])): return false
     for k in recipe.in.keys():

@@ -5,12 +5,12 @@ extends Node
 
 func _ready() -> void:
     # Instancier le toit
-    var roof = roof_scene.instantiate()
+    var roof: Node3D = roof_scene.instantiate()
     add_child(roof)
     
     # Trouver le spawn point et instancier le player
-    var spawn_point = roof.get_node("SpawnPoint")
+    var spawn_point: Node3D = roof.get_node("SpawnPoint")
     if spawn_point and player_scene:
-        var player = player_scene.instantiate()
+        var player: CharacterBody3D = player_scene.instantiate()
         add_child(player)
         player.global_position = spawn_point.global_position
