@@ -17,7 +17,7 @@ func _ready() -> void:
     if btn_filter:
         btn_filter.pressed.connect(_on_filter_pressed)
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
     if stats == null: return
     pb_hunger.value = stats.hunger
     pb_thirst.value = stats.thirst
