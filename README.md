@@ -44,3 +44,8 @@ Prototype Godot 4 chill survival sur un toit : faim/soif/énergie/température, 
 - ✅ S1: mouvements + HUD + jauges
 - 🔄 S2: météo + cycle jour/nuit + collecte pluie
 - ⏳ S3: inventaire + craft T1 depuis `data/recipes.json`
+
+## Notes techniques
+
+- **Syntaxe GDScript** : Utilise `a if condition else b` au lieu de `condition ? a : b`
+- **Validation** : `godot --headless --check-only` pour vérifier la syntaxe sans lancement
