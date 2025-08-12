@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://d0eo0vykvdqt2"]
+[gd_scene load_steps=14 format=3 uid="uid://d0eo0vykvdqt2"]
 
 [ext_resource type="Script" uid="uid://cf00cuj8v7kqq" path="res://scripts/Stats.gd" id="1_7h1vh"]
 [ext_resource type="Script" uid="uid://db7h6g6n6wh0d" path="res://scripts/Weather.gd" id="2_1xh2c"]
@@ -10,6 +10,8 @@
 [ext_resource type="Script" uid="uid://hge4p1q7f2r4" path="res://scripts/SaveLoad.gd" id="8_5t6w9"]
 [ext_resource type="PackedScene" uid="uid://biqkxc6o2xegw" path="res://scenes/world/Roof.tscn" id="9_1a2b3"]
 [ext_resource type="PackedScene" uid="uid://b8xqt7q4vhp5s" path="res://scenes/Player.tscn" id="10_4c5d6"]
+[ext_resource type="Script" path="res://scripts/DayNight.gd" id="11_daynight"]
+[ext_resource type="Script" path="res://scripts/Atmosphere.gd" id="12_atmosphere"]
 
 [sub_resource type="Environment" id="Environment_1a2b3"]
 ambient_light_source = 2
@@ -37,6 +39,12 @@ script = ExtResource("5_x9m2r")
 
 [node name="SaveLoad" type="Node" parent="."]
 script = ExtResource("8_5t6w9")
+
+[node name="DayNight" type="Node" parent="."]
+script = ExtResource("11_daynight")
+
+[node name="Atmosphere" type="Node" parent="."]
+script = ExtResource("12_atmosphere")
 
 [node name="HUD" parent="." instance=ExtResource("6_8v4x2")]
 
