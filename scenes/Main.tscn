@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://d0eo0vykvdqt2"]
+[gd_scene load_steps=18 format=3 uid="uid://d0eo0vykvdqt2"]
 
 [ext_resource type="Script" uid="uid://cf00cuj8v7kqq" path="res://scripts/Stats.gd" id="1_7h1vh"]
 [ext_resource type="Script" uid="uid://db7h6g6n6wh0d" path="res://scripts/Weather.gd" id="2_1xh2c"]
@@ -8,6 +8,18 @@
 [ext_resource type="PackedScene" uid="uid://cls8xr2m5r2qb" path="res://scenes/ui/HUD.tscn" id="6_8v4x2"]
 [ext_resource type="Script" uid="uid://c3r2533wj6g37" path="res://scripts/GameManager.gd" id="7_9k3l1"]
 [ext_resource type="Script" uid="uid://hge4p1q7f2r4" path="res://scripts/SaveLoad.gd" id="8_5t6w9"]
+[ext_resource type="PackedScene" uid="uid://biqkxc6o2xegw" path="res://scenes/world/Roof.tscn" id="9_1a2b3"]
+[ext_resource type="PackedScene" uid="uid://b8xqt7q4vhp5s" path="res://scenes/Player.tscn" id="10_4c5d6"]
+[ext_resource type="Script" uid="uid://dhmfm565r2e6m" path="res://scripts/DayNight.gd" id="11_daynight"]
+[ext_resource type="Script" uid="uid://c83cwydkv1r8g" path="res://scripts/Atmosphere.gd" id="12_atmosphere"]
+[ext_resource type="Script" uid="uid://dxv5oope7e2ip" path="res://scripts/RainController.gd" id="13_raincontroller"]
+[ext_resource type="Script" uid="uid://b88q38r5s0k5e" path="res://scripts/TemperatureSystem.gd" id="14_temperature"]
+[ext_resource type="Script" uid="uid://cuwa8lg6g0ope" path="res://scripts/AudioManager.gd" id="15_audiomanager"]
+[ext_resource type="PackedScene" uid="uid://bvno8f1w2xk7h" path="res://scenes/ui/PauseMenu.tscn" id="16_pausemenu"]
+
+[sub_resource type="Environment" id="Environment_1a2b3"]
+ambient_light_source = 2
+ambient_light_energy = 0.6
 
 [node name="Main" type="Node"]
 
@@ -32,4 +44,47 @@ script = ExtResource("5_x9m2r")
 [node name="SaveLoad" type="Node" parent="."]
 script = ExtResource("8_5t6w9")
 
+[node name="DayNight" type="Node" parent="."]
+script = ExtResource("11_daynight")
+
+[node name="Atmosphere" type="Node" parent="."]
+script = ExtResource("12_atmosphere")
+
 [node name="HUD" parent="." instance=ExtResource("6_8v4x2")]
+
+[node name="MainCamera" type="Camera3D" parent="."]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 15, 15)
+current = true
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.659983, -0.433013, 0.612372, 0, 0.816497, 0.5773, -0.75131, -0.38092, 0.538986, 0, 0, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_1a2b3")
+
+[node name="RainFX" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 30, 0)
+emitting = false
+amount = 1500
+
+[node name="RainAudio" type="AudioStreamPlayer" parent="."]
+
+[node name="RainController" type="Node" parent="."]
+script = ExtResource("13_raincontroller")
+
+[node name="TemperatureSystem" type="Node" parent="."]
+script = ExtResource("14_temperature")
+
+[node name="Ambience" type="AudioStreamPlayer" parent="."]
+
+[node name="AudioManager" type="Node" parent="."]
+script = ExtResource("15_audiomanager")
+
+[node name="World" type="Node3D" parent="."]
+
+[node name="RoofScene" parent="World" instance=ExtResource("9_1a2b3")]
+
+[node name="Player" parent="." instance=ExtResource("10_4c5d6")]
+
+[node name="PauseMenu" parent="." instance=ExtResource("16_pausemenu")]
