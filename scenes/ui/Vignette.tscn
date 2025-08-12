@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3 uid="uid://vignette123"]
+
+[sub_resource type="Shader" id="Shader_Vignette"]
+code = "shader_type canvas_item;
+uniform float strength = 0.35;
+void fragment() {
+    vec2 uv = UV * 2.0 - 1.0;
+    float v = smoothstep(0.6, 1.0, length(uv));
+    COLOR = vec4(0.0, 0.0, 0.0, v * strength);
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_Vignette"]
+shader = SubResource("Shader_Vignette")
+shader_parameter/strength = 0.35
+
+[node name="Vignette" type="CanvasLayer"]
+
+[node name="VignetteRect" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+material = SubResource("ShaderMaterial_Vignette")
+color = Color(1, 1, 1, 1)

@@ -1,4 +1,6 @@
-[gd_scene load_steps=18 format=3 uid="uid://d0eo0vykvdqt2"]
+
+[gd_scene load_steps=15 format=3 uid="uid://d0eo0vykvdqt2"]
+
 
 [ext_resource type="Script" uid="uid://cf00cuj8v7kqq" path="res://scripts/Stats.gd" id="1_7h1vh"]
 [ext_resource type="Script" uid="uid://db7h6g6n6wh0d" path="res://scripts/Weather.gd" id="2_1xh2c"]
@@ -10,16 +12,56 @@
 [ext_resource type="Script" uid="uid://hge4p1q7f2r4" path="res://scripts/SaveLoad.gd" id="8_5t6w9"]
 [ext_resource type="PackedScene" uid="uid://biqkxc6o2xegw" path="res://scenes/world/Roof.tscn" id="9_1a2b3"]
 [ext_resource type="PackedScene" uid="uid://b8xqt7q4vhp5s" path="res://scenes/Player.tscn" id="10_4c5d6"]
-[ext_resource type="Script" uid="uid://dhmfm565r2e6m" path="res://scripts/DayNight.gd" id="11_daynight"]
-[ext_resource type="Script" uid="uid://c83cwydkv1r8g" path="res://scripts/Atmosphere.gd" id="12_atmosphere"]
-[ext_resource type="Script" uid="uid://dxv5oope7e2ip" path="res://scripts/RainController.gd" id="13_raincontroller"]
-[ext_resource type="Script" uid="uid://b88q38r5s0k5e" path="res://scripts/TemperatureSystem.gd" id="14_temperature"]
-[ext_resource type="Script" uid="uid://cuwa8lg6g0ope" path="res://scripts/AudioManager.gd" id="15_audiomanager"]
-[ext_resource type="PackedScene" uid="uid://bvno8f1w2xk7h" path="res://scenes/ui/PauseMenu.tscn" id="16_pausemenu"]
+
+[ext_resource type="Script" uid="uid://wetnessctrl123" path="res://scripts/WetnessController.gd" id="11_wetness"]
+[ext_resource type="PackedScene" uid="uid://vignette123" path="res://scenes/ui/Vignette.tscn" id="12_vignette"]
+[ext_resource type="Script" uid="uid://rainctrl123" path="res://scripts/RainController.gd" id="13_rainctrl"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
+sky_energy_multiplier = 0.9
+sky_top_color = Color(0.149, 0.2, 0.251, 1)
+sky_horizon_color = Color(0.227, 0.271, 0.322, 1)
+
+[sub_resource type="Sky" id="Sky_1"]
+sky_material = SubResource("ProceduralSkyMaterial_1")
 
 [sub_resource type="Environment" id="Environment_1a2b3"]
-ambient_light_source = 2
+background_mode = 2
+sky = SubResource("Sky_1")
+ambient_light_source = 3
 ambient_light_energy = 0.6
+tonemap_mode = 2
+tonemap_exposure = 0.8
+ssr_enabled = true
+ssao_enabled = true
+ssao_radius = 0.5
+ssao_intensity = 1.0
+glow_enabled = true
+glow_intensity = 0.05
+glow_strength = 1.0
+glow_blend_mode = 2
+glow_hdr_threshold = 1.0
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.02
+volumetric_fog_albedo = Color(1, 1, 1, 1)
+volumetric_fog_emission = Color(0, 0, 0, 1)
+volumetric_fog_emission_energy = 1.0
+volumetric_fog_gi_inject = 1.0
+volumetric_fog_anisotropy = 0.2
+volumetric_fog_length = 64.0
+volumetric_fog_detail_spread = 2.0
+volumetric_fog_ambient_inject = 0.0
+volumetric_fog_sky_affect = 0.6
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_Rain"]
+direction = Vector3(0, -1, 0)
+spread = 5.0
+initial_velocity_min = 15.0
+initial_velocity_max = 20.0
+gravity = Vector3(0, -20, 0)
+scale_min = 0.1
+scale_max = 0.3
+emission_box_extents = Vector3(30, 1, 30)
 
 [node name="Main" type="Node"]
 
@@ -44,11 +86,14 @@ script = ExtResource("5_x9m2r")
 [node name="SaveLoad" type="Node" parent="."]
 script = ExtResource("8_5t6w9")
 
-[node name="DayNight" type="Node" parent="."]
-script = ExtResource("11_daynight")
+[node name="WetnessController" type="Node" parent="."]
+script = ExtResource("11_wetness")
 
-[node name="Atmosphere" type="Node" parent="."]
-script = ExtResource("12_atmosphere")
+[node name="RainController" type="Node" parent="."]
+script = ExtResource("13_rainctrl")
+
+[node name="Vignette" parent="." instance=ExtResource("12_vignette")]
+
 
 [node name="HUD" parent="." instance=ExtResource("6_8v4x2")]
 
@@ -87,4 +132,14 @@ script = ExtResource("15_audiomanager")
 
 [node name="Player" parent="." instance=ExtResource("10_4c5d6")]
 
-[node name="PauseMenu" parent="." instance=ExtResource("16_pausemenu")]
+
+[node name="RainFX" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, 0)
+emitting = false
+amount = 1200
+lifetime = 1.2
+speed_scale = 1.0
+visibility_aabb = AABB(-32, -2, -32, 64, 16, 64)
+local_coords = false
+process_material = SubResource("ParticleProcessMaterial_Rain")
+

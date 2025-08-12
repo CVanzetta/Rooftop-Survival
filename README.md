@@ -42,10 +42,39 @@ Prototype Godot 4 chill survival sur un toit : faim/soif/énergie/température, 
 ## Roadmap MVP
 
 - ✅ S1: mouvements + HUD + jauges
-- 🔄 S2: météo + cycle jour/nuit + collecte pluie
-- ⏳ S3: inventaire + craft T1 depuis `data/recipes.json`
 
-## Notes techniques
+- ✅ S2: météo + cycle jour/nuit + collecte pluie + Atmosphere & Comfort Pack 1
+- ✅ S3: Visuals Pack 0 (ciel, fog, wetness, props)
+- ⏳ S4: inventaire + craft T1 depuis `data/recipes.json`
 
-- **Syntaxe GDScript** : Utilise `a if condition else b` au lieu de `condition ? a : b`
-- **Validation** : `godot --headless --check-only` pour vérifier la syntaxe sans lancement
+## Visuals Pack 0 🎨
+
+**Améliorations visuelles immersives** :
+
+### 🌌 **Environnement**
+- **Ciel procédural** : Tons bleu nuit (#263340 → #3a4552) avec sky_energy=0.9
+- **Fog volumétrique** : Brouillard doux (density=0.02, height=10m) pour l'ambiance
+- **Post-processing** : ACES tonemap, SSAO subtil, Bloom discret
+
+### 🏢 **Props sur le toit**
+- **Parapets** : 4 murets de protection autour du toit (gris #3a3f44)
+- **Unité HVAC** : Système de ventilation low-poly empilé (métal #6f7a84)
+- **Réservoir d'eau** : Tank cylindrique pour l'immersion (#5a6a7a)
+
+### 💧 **Shader Wetness**
+- **Sol dynamique** : S'assombrit et devient brillant sous la pluie
+- **Transition progressive** : Mouillage rapide (3s), séchage lent (séchage en 2x plus lent)
+- **Automatique** : Lié au système météo (`Weather.profile.rain`)
+
+### 🎭 **Interface**
+- **Vignette discrète** : Effet d'assombrissement des bords (strength=0.35)
+- **Particules de pluie** : 1200 particules optimisées, emission_box 30x30m
+
+### 🧪 **Tester les effets**
+Pour forcer la pluie et voir l'effet de mouillage :
+1. Modifier `data/weather_profiles.json` : `"rain": 0.9`
+2. Relancer le jeu → Le sol devient sombre et brillant
+3. Remettre `"rain": 0.0` → Le sol sèche progressivement
+
+**Résultat** : Environnement visuel crédible avec ambiance immersive et effets météo réactifs.
+
