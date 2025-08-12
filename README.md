@@ -14,6 +14,7 @@ Prototype Godot 4 chill survival sur un toit : faim/soif/énergie/température, 
 - **Déplacement** : ZQSD ou flèches directionnelles
 - **Sauvegarde** : F5
 - **Chargement** : F9
+- **Pause** : Esc (menu avec Resume, Save, Quit)
 - **Interface** : HUD avec jauges de survie et gestion de l'eau
 
 ## Scène de test
@@ -22,17 +23,26 @@ Prototype Godot 4 chill survival sur un toit : faim/soif/énergie/température, 
 - **Contrôles** : ZQSD/Flèches = déplacement sur le toit
 - **Environnement** : Sol placeholder avec éclairage directionnel et environnement ambient
 
+## Atmosphere & Comfort
+
+- **Cycle jour/nuit** : 24 minutes réelles = 24 heures de jeu (configurable)
+- **Pluie visible/sonore** : particules et audio synchronisés avec la météo
+- **Effets de température** : influence subtile sur soif/énergie (pas punitif)
+- **Audio d'ambiance** : sons différents jour/nuit
+- **Placeholders audio** : rain_loop.ogg et ambience_night.ogg (OK si vides)
+
 ## Fonctionnalités
 
 - **Déplacement 3D** du joueur sur le toit
 - **Jauges de survie** : faim, soif, énergie, température corporelle
 - **Système météo** : collecte d'eau de pluie automatique
 - **Filtrage d'eau** : transformer eau brute en eau potable (coûte du charbon)
-- **Sauvegarde/chargement** : persistance de l'état du jeu
+- **Sauvegarde/chargement** : persistance de l'état du jeu + heure du jour
 
 ## Roadmap MVP
 
 - ✅ S1: mouvements + HUD + jauges
+
 - ✅ S2: météo + cycle jour/nuit + collecte pluie + Atmosphere & Comfort Pack 1
 - ✅ S3: Visuals Pack 0 (ciel, fog, wetness, props)
 - ⏳ S4: inventaire + craft T1 depuis `data/recipes.json`
@@ -67,3 +77,4 @@ Pour forcer la pluie et voir l'effet de mouillage :
 3. Remettre `"rain": 0.0` → Le sol sèche progressivement
 
 **Résultat** : Environnement visuel crédible avec ambiance immersive et effets météo réactifs.
+

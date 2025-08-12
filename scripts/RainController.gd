@@ -11,7 +11,9 @@ func _process(_delta: float) -> void:
 	if rain_fx:
 		rain_fx.emitting = on
 		if on:
+
 			rain_fx.amount = int(1200.0 * clamp(r, 0.15, 1.0))
+
 	if rain_audio:
 		if on and !rain_audio.playing: rain_audio.play()
 		if !on and rain_audio.playing: rain_audio.stop()
