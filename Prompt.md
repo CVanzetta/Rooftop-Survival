@@ -1,229 +1,141 @@
+🔧 Prompt MCP — Visuals Pack 0 (Godot 4)
 Contexte
 
 Repo: <REPO_URL>
 
-Crée la branche feat/atmo-comfort-1, PR vers main — titre: Atmosphere & Comfort Pack 1
+Branche: feat/visuals-pack-0 → PR vers main : Visuals Pack 0 (sky, fog, wetness, props)
 
-Objectif: cycle jour/nuit + météo visible (pluie) + ambiance sonore + température (effets doux) + pause menu + save/load de l’heure.
+But: ciel, fog, post‑process, props simples, shader “wetness” piloté par la pluie.
 
 Tâches
-1) Cycle jour/nuit
-Fichier: scripts/DayNight.gd
+1) WorldEnvironment (ciel + fog + postprocess)
+Éditer scenes/Main.tscn → WorldEnvironment :
+
+Activer Sky avec ProceduralSkyMaterial :
+
+sky_energy = 0.9, sky_top_color = #263340 (bleu nuit), sky_horizon_color = #3a4552
+
+Fog activé :
+
+volumetric_fog_enabled = true
+
+fog_density = 0.02, fog_height = 10, fog_sky_affect = 0.6
+
+Tonemap: ACES, exposure = 0.8
+
+SSAO: enabled = true (radius 0.5, intensity 1.0)
+
+Bloom: enabled = true (threshold 1.0, intensity 0.05)
+
+2) Parapets + props low‑poly sur le toit
+Dans scenes/world/Roof.tscn, sous RoofRoot :
+
+Parapets (quatre MeshInstance3D BoxMesh hauteur 1, épaisseur 0.2, autour du plateau).
+
+HVAC_Unit (deux BoxMesh empilés 1.2×0.8×0.8 + 0.9×0.5×0.5).
+
+Water_Tank (CylinderMesh 0.6×1.2).
+
+Matériaux StandardMaterial3D :
+
+Sol: gris #2b2f33 (roughness 0.95).
+
+Parapets: #3a3f44.
+
+HVAC: #6f7a84, metalness 0.1.
+
+Tank: #5a6a7a, metalness 0.05.
+
+3) Shader “Wetness” (sol qui se mouille)
+Nouveau fichier shaders/wet_floor.tres (ShaderMaterial) avec shader :
+
+glsl
+Copier le code
+shader_type spatial;
+render_mode cull_back;
+
+uniform float wetness : hint_range(0.0, 1.0) = 0.0;
+uniform vec3 base_color : source_color = vec3(0.17, 0.18, 0.20);
+
+void fragment() {
+    float w = clamp(wetness, 0.0, 1.0);
+    ALBEDO = mix(base_color, base_color * 0.75, w); // plus sombre mouillé
+    ROUGHNESS = mix(0.95, 0.25, w);
+    METALLIC = 0.0;
+}
+Assigner ce ShaderMaterial au Floor (MeshInstance3D) de Roof.tscn.
+
+4) Contrôleur de pluie → wetness
+Nouveau scripts/WetnessController.gd :
 
 gdscript
 Copier le code
 extends Node
-class_name DayNight
+class_name WetnessController
 
-@export var minutes_per_day := 24.0
-var time_of_day := 22.0 # start late night
-
-@onready var sun: DirectionalLight3D = $"../Sun"
+@onready var weather: Weather = $"../Weather"
+@onready var roof: Node3D = $"../World/RoofRoot/Floor"
+var wetness: float = 0.0
 
 func _process(delta: float) -> void:
-    var spd := 24.0 / (minutes_per_day * 60.0)
-    time_of_day = fmod(time_of_day + spd * delta, 24.0)
-    if sun:
-        var t := time_of_day / 24.0
-        sun.rotation_degrees.x = lerp(-15.0, 205.0, t)
-        var is_night := time_of_day < 6.0 or time_of_day > 20.0
-        sun.light_energy = is_night ? 0.25 : 1.0
-Instancier DayNight dans scenes/Main.tscn (sibling de Sun).
+    var rain: float = float(weather.profile.get("rain", 0.0))
+    var target: float = clamp(rain, 0.0, 1.0)
+    # séchage lent, mouillage un peu plus rapide
+    var rate: float = (3.0 if target > wetness else 0.5)
+    wetness = clamp(lerp(wetness, target, rate * delta), 0.0, 1.0)
+    if roof and roof.get_surface_override_material_count() > 0:
+        var mat := roof.get_surface_override_material(0)
+        if mat and mat.has_method("set_shader_parameter"):
+            mat.set_shader_parameter("wetness", wetness)
+Ajouter WetnessController sous Main et vérifier le chemin vers Floor.
 
-2) Atmosphère / WorldEnvironment
-Fichier: scripts/Atmosphere.gd
+5) Vignette discrète (HUD overlay)
+Nouvelle scène scenes/ui/Vignette.tscn (CanvasLayer > ColorRect “Vignette”) :
 
-gdscript
+Plein écran, Material Shader :
+
+glsl
 Copier le code
-extends Node
-class_name Atmosphere
+shader_type canvas_item;
+uniform float strength = 0.35;
+void fragment() {
+    vec2 uv = UV * 2.0 - 1.0;
+    float v = smoothstep(0.6, 1.0, length(uv));
+    COLOR = vec4(0.0, 0.0, 0.0, v * strength);
+}
+Instancier Vignette sous Main (au‑dessus du HUD).
 
-@onready var env: WorldEnvironment = $"../WorldEnvironment"
-@onready var weather: Weather = $"../Weather"
-@onready var daynight: DayNight = $"../DayNight"
+6) Pluie visible (ajustements rapides)
+RainFX (GPUParticles3D) sous Main :
 
-func _process(_delta: float) -> void:
-    if !env or !env.environment: return
-    var e := env.environment
-    var is_night := daynight.time_of_day < 6.0 or daynight.time_of_day > 20.0
-    var overcast := clamp(weather.profile.get("light", 0.6), 0.2, 1.0)
-    e.ambient_light_energy = is_night ? 0.25 : 0.8 * overcast
-    e.tonemap_exposure = is_night ? 0.6 : 0.9 * overcast
-Ajouter un WorldEnvironment si manquant (tu en as déjà un via PR #4 → juste brancher le script).
+amount = 1200, lifetime = 1.2, speed_scale = 1.0
 
-3) Pluie visible + son
-Ajouter sous Main :
+emission_box_extents = (30, 1, 30), position.y = 12
 
-GPUParticles3D nommé RainFX (emitter au‑dessus du toit, large AABB).
+gravity = (0, -20, 0), direction = (0, -1, 0), scale curve légère si dispo.
 
-AudioStreamPlayer nommé RainAudio (placeholder audio assets/sfx/rain_loop.ogg ; si absent, laisser non assigné).
+Dans RainController.gd, clamp amount : int(1200.0 * clamp(r, 0.15, 1.0)).
 
-Fichier: scripts/RainController.gd
+7) README
+Ajouter section “Visuals Pack 0” (sky, fog, wetness, vignette) + capture rapide.
 
-gdscript
-Copier le code
-extends Node
-class_name RainController
+8) Commits
+feat: add procedural sky, fog and postprocess
 
-@onready var weather: Weather = $"../Weather"
-@onready var rain_fx: GPUParticles3D = $"../RainFX"
-@onready var rain_audio: AudioStreamPlayer = $"../RainAudio"
+feat: add roof parapets and simple props
 
-func _process(_delta: float) -> void:
-    var r := float(weather.profile.get("rain", 0.0))
-    var on := r > 0.1
-    if rain_fx:
-        rain_fx.emitting = on
-        if on:
-            rain_fx.amount = int(1500.0 * clamp(r, 0.2, 1.0))
-    if rain_audio:
-        if on and !rain_audio.playing: rain_audio.play()
-        if !on and rain_audio.playing: rain_audio.stop()
-Instancier RainController dans Main.
+feat: add wetness shader and controller bound to rain
 
-4) Température (effets doux, jamais punitif)
-Adapter scripts/Stats.gd : passer les const modulables en var et exposer des multiplicateurs.
+feat: add vignette overlay and tweak rain particles
 
-gdscript
-Copier le code
-# Stats.gd (extrait)
-var hunger: float = 0.0
-var thirst: float = 0.0
-var energy: float = 100.0
-var body_temp: float = 36.8
+docs: update README with Visuals Pack 0
 
-var HUNGER_RATE := 0.35
-var THIRST_RATE := 0.60
-var ENERGY_REGEN := 30.0
+9) Critères d’acceptation
+Lancement → ciel visible, fog doux, éclairage crédible.
 
-var thirst_mult := 1.0
-var energy_regen_mult := 1.0
+Parapets/props présents, ombres OK.
 
-func _process(delta: float) -> void:
-    hunger = clamp(hunger + HUNGER_RATE * delta, 0.0, 100.0)
-    thirst = clamp(thirst + (THIRST_RATE * thirst_mult) * delta, 0.0, 100.0)
-    energy = clamp(energy + (ENERGY_REGEN * energy_regen_mult) * delta, 0.0, 100.0)
-Nouveau fichier: scripts/TemperatureSystem.gd
+Quand rain > 0.1 → sol s’assombrit et devient plus brillant; redevient mat quand la pluie cesse.
 
-gdscript
-Copier le code
-extends Node
-class_name TemperatureSystem
-
-@onready var weather: Weather = $"../Weather"
-@onready var daynight: DayNight = $"../DayNight"
-@onready var stats: Stats = $"../Stats"
-
-func _process(_delta: float) -> void:
-    var base := float(weather.profile.get("temp", 15.0))
-    if daynight.time_of_day < 6.0 or daynight.time_of_day > 20.0:
-        base -= 2.0
-    # map 8..28°C → modulateurs 0.9..1.15 (subtil)
-    var thirst_mult := clamp(remap(base, 8.0, 28.0, 0.9, 1.15), 0.85, 1.2)
-    var energy_mult := clamp(remap(base, 8.0, 28.0, 0.95, 1.0), 0.85, 1.1)
-    stats.thirst_mult = thirst_mult
-    stats.energy_regen_mult = 1.0 / energy_mult
-Instancier TemperatureSystem dans Main.
-
-5) Audio d’ambiance nuit/jour
-Ajouter AudioStreamPlayer sous Main nommé Ambience (placeholder assets/sfx/ambience_night.ogg si présent).
-
-Fichier: scripts/AudioManager.gd
-
-gdscript
-Copier le code
-extends Node
-class_name AudioManager
-
-@onready var daynight: DayNight = $"../DayNight"
-@onready var amb: AudioStreamPlayer = $"../Ambience"
-
-func _process(_delta: float) -> void:
-    if !amb: return
-    var night := daynight.time_of_day < 6.0 or daynight.time_of_day > 20.0
-    amb.volume_db = night ? -8.0 : -12.0
-    if !amb.playing: amb.play()
-Instancier AudioManager dans Main.
-
-6) Pause Menu (Esc)
-scenes/ui/PauseMenu.tscn (CanvasLayer + Control simple avec 3 boutons: Resume, Save, Quit).
-
-scripts/PauseMenu.gd
-
-gdscript
-Copier le code
-extends CanvasLayer
-class_name PauseMenu
-
-@onready var root: Control = $Control
-
-func _ready() -> void:
-    root.visible = false
-
-func _unhandled_input(event: InputEvent) -> void:
-    if event.is_action_pressed("ui_cancel"):
-        toggle_pause()
-
-func toggle_pause() -> void:
-    var v := !root.visible
-    root.visible = v
-    get_tree().paused = v
-
-func _on_resume_pressed() -> void: toggle_pause()
-func _on_save_pressed() -> void:
-    var save := get_node("../SaveLoad")
-    if save: save.save_state({})
-func _on_quit_pressed() -> void:
-    get_tree().quit()
-Brancher les boutons aux fonctions. Ajouter la scène PauseMenu dans Main.
-
-7) Save/Load — heure du jour
-Étendre scripts/SaveLoad.gd pour stocker/restaurer DayNight.time_of_day :
-
-gdscript
-Copier le code
-func save_state(state: Dictionary) -> void:
-    var d := get_node("../DayNight")
-    if d:
-        state["time_of_day"] = d.time_of_day
-    # merge avec autres états existants (stats, inventory, water)
-    var f = FileAccess.open("user://save.json", FileAccess.WRITE)
-    f.store_string(JSON.stringify(state))
-
-func load_state() -> Dictionary:
-    if !FileAccess.file_exists("user://save.json"): return {}
-    var f = FileAccess.open("user://save.json", FileAccess.READ)
-    var s: Dictionary = JSON.parse_string(f.get_as_text())
-    var d := get_node("../DayNight")
-    if d and s.has("time_of_day"):
-        d.time_of_day = float(s["time_of_day"])
-    return s
-8) README
-Section “Atmosphere & Comfort” (cycle jour/nuit, pluie visible/sonore, Esc = pause).
-
-Mention placeholders audio (OK s’ils sont vides).
-
-Commits (Conventional)
-feat: add day-night cycle and environment controller
-
-feat: add rain particles and rain audio synced to weather
-
-feat: add gentle temperature effects on thirst/energy
-
-feat: add ambience loop and pause menu (esc)
-
-feat: persist time_of_day in save/load
-
-docs: update README (atmosphere & controls)
-
-Critères d’acceptation
-La lumière/exposition varient en continu (24 min = 24h par défaut).
-
-Quand Weather.profile.rain > 0.1 → particules pluie + rain_loop démarrent, sinon s’arrêtent.
-
-Température influence légèrement la soif/énergie (pas de “game over”, pas de gros malus).
-
-Esc ouvre/ferme un menu pause fonctionnel.
-
-Sauvegarde/chargement restaurent l’heure du jour.
+Vignette visible mais discrète (pas de gêne pour lire le HUD).
 
