@@ -1,2 +1,2 @@
 res://scenes/Main.tscn
-res://scripts/HUD.gd
+res://scripts/SaveLoad.gd

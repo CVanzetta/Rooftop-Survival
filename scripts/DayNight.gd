@@ -13,4 +13,4 @@ func _process(delta: float) -> void:
 		var t := time_of_day / 24.0
 		sun.rotation_degrees.x = lerp(-15.0, 205.0, t)
 		var is_night := time_of_day < 6.0 or time_of_day > 20.0
-		sun.light_energy = is_night ? 0.25 : 1.0
+		sun.light_energy = 0.25 if is_night else 1.0
