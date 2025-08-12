@@ -1,16 +1,16 @@
 extends Node
 
-@export var player_scene: PackedScene = preload("res://scenes/Player.tscn")
-@export var roof_scene: PackedScene = preload("res://scenes/world/Roof.tscn")
-
 func _ready() -> void:
-    # Instancier le toit
-    var roof: Node3D = roof_scene.instantiate()
-    add_child(roof)
+    # Attendre que la scène soit complètement chargée
+    await get_tree().process_frame
     
-    # Trouver le spawn point et instancier le player
-    var spawn_point: Node3D = roof.get_node("SpawnPoint")
-    if spawn_point and player_scene:
-        var player: CharacterBody3D = player_scene.instantiate()
-        add_child(player)
-        player.global_position = spawn_point.global_position
+    # Trouver le Player et le spawn point
+    var player: CharacterBody3D = get_node("../Player")
+    var world: Node3D = get_node("../World")
+    
+    if player and world:
+        var roof_scene: Node3D = world.get_node("RoofScene")
+        if roof_scene:
+            var spawn_point: Marker3D = roof_scene.get_node("PlayerSpawn")
+            if spawn_point:
+                player.global_position = spawn_point.global_position

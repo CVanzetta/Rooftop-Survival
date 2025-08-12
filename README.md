@@ -10,12 +10,20 @@ Prototype Godot 4 chill survival sur un toit : faim/soif/énergie/température, 
 3. F5 pour lancer.
 
 ## Contrôles
+
 - **Déplacement** : ZQSD ou flèches directionnelles
 - **Sauvegarde** : F5
 - **Chargement** : F9
 - **Interface** : HUD avec jauges de survie et gestion de l'eau
 
+## Scène de test
+
+- **Caméra isométrique** : vue d'ensemble du toit avec angle incliné
+- **Contrôles** : ZQSD/Flèches = déplacement sur le toit
+- **Environnement** : Sol placeholder avec éclairage directionnel et environnement ambient
+
 ## Fonctionnalités
+
 - **Déplacement 3D** du joueur sur le toit
 - **Jauges de survie** : faim, soif, énergie, température corporelle
 - **Système météo** : collecte d'eau de pluie automatique
@@ -23,6 +31,7 @@ Prototype Godot 4 chill survival sur un toit : faim/soif/énergie/température, 
 - **Sauvegarde/chargement** : persistance de l'état du jeu
 
 ## Roadmap MVP
+
 - ✅ S1: mouvements + HUD + jauges
 - 🔄 S2: météo + cycle jour/nuit + collecte pluie
 - ⏳ S3: inventaire + craft T1 depuis `data/recipes.json`
