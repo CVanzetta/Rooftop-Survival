@@ -2,26 +2,26 @@ name: Godot Parse Check
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   parse-check:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Godot
-      uses: chickensoft-games/setup-godot@v2
-      with:
-        version: 4.4.1
-        use-dotnet: false
-        
-    - name: Import project
-      run: godot --headless --import
-      
-    - name: Parse check all scripts
-      run: godot --headless --check-only
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.4.1
+          use-dotnet: false
+
+      - name: Import project
+        run: godot --headless --import
+
+      - name: Parse check all scripts
+        run: godot --headless --check-only
