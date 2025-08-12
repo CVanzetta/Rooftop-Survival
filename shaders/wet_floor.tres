@@ -1,0 +1,21 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[sub_resource type="Shader" id="Shader_1"]
+code = "shader_type spatial;
+render_mode cull_back;
+
+uniform float wetness : hint_range(0.0, 1.0) = 0.0;
+uniform vec3 base_color : source_color = vec3(0.17, 0.18, 0.20);
+
+void fragment() {
+    float w = clamp(wetness, 0.0, 1.0);
+    ALBEDO = mix(base_color, base_color * 0.75, w); // plus sombre mouillé
+    ROUGHNESS = mix(0.95, 0.25, w);
+    METALLIC = 0.0;
+}
+"
+
+[resource]
+shader = SubResource("Shader_1")
+shader_parameter/wetness = 0.0
+shader_parameter/base_color = Vector3(0.17, 0.18, 0.2)
