@@ -1,20 +1,50 @@
-[gd_scene load_steps=4 format=3 uid="uid://biqkxc6o2xegw"]
+[gd_scene load_steps=14 format=3 uid="uid://biqkxc6o2xegw"]
+
+[ext_resource type="Material" uid="uid://wetfloor123" path="res://shaders/wet_floor.tres" id="1_wetfloor"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_1a2b3"]
 size = Vector2(40, 40)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1a2b3"]
-albedo_color = Color(0.5, 0.5, 0.5, 1)
-roughness = 1.0
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_Floor"]
+albedo_color = Color(0.169, 0.184, 0.2, 1)
+roughness = 0.95
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_1v9m2"]
 size = Vector3(40, 0.2, 40)
+
+[sub_resource type="BoxMesh" id="BoxMesh_Parapet"]
+size = Vector3(40, 1.0, 0.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_Parapet"]
+albedo_color = Color(0.227, 0.247, 0.267, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="BoxMesh_HVAC_Base"]
+size = Vector3(1.2, 0.8, 0.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_HVAC_Top"]
+size = Vector3(0.9, 0.5, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_HVAC"]
+albedo_color = Color(0.435, 0.478, 0.518, 1)
+metallic = 0.1
+roughness = 0.7
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_Tank"]
+top_radius = 0.6
+bottom_radius = 0.6
+height = 1.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_Tank"]
+albedo_color = Color(0.353, 0.416, 0.478, 1)
+metallic = 0.05
+roughness = 0.6
 
 [node name="RoofRoot" type="Node3D"]
 
 [node name="Floor" type="MeshInstance3D" parent="."]
 mesh = SubResource("PlaneMesh_1a2b3")
-material_override = SubResource("StandardMaterial3D_1a2b3")
+surface_material_override/0 = ExtResource("1_wetfloor")
 
 [node name="FloorBody" type="StaticBody3D" parent="."]
 
@@ -23,3 +53,43 @@ shape = SubResource("BoxShape3D_1v9m2")
 
 [node name="PlayerSpawn" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+
+[node name="Parapets" type="Node3D" parent="."]
+
+[node name="ParapetNorth" type="MeshInstance3D" parent="Parapets"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -20)
+mesh = SubResource("BoxMesh_Parapet")
+material_override = SubResource("StandardMaterial3D_Parapet")
+
+[node name="ParapetSouth" type="MeshInstance3D" parent="Parapets"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 20)
+mesh = SubResource("BoxMesh_Parapet")
+material_override = SubResource("StandardMaterial3D_Parapet")
+
+[node name="ParapetEast" type="MeshInstance3D" parent="Parapets"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 20, 0.5, 0)
+mesh = SubResource("BoxMesh_Parapet")
+material_override = SubResource("StandardMaterial3D_Parapet")
+
+[node name="ParapetWest" type="MeshInstance3D" parent="Parapets"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -20, 0.5, 0)
+mesh = SubResource("BoxMesh_Parapet")
+material_override = SubResource("StandardMaterial3D_Parapet")
+
+[node name="HVAC_Unit" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -8)
+
+[node name="HVAC_Base" type="MeshInstance3D" parent="HVAC_Unit"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+mesh = SubResource("BoxMesh_HVAC_Base")
+material_override = SubResource("StandardMaterial3D_HVAC")
+
+[node name="HVAC_Top" type="MeshInstance3D" parent="HVAC_Unit"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+mesh = SubResource("BoxMesh_HVAC_Top")
+material_override = SubResource("StandardMaterial3D_HVAC")
+
+[node name="Water_Tank" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.6, 10)
+mesh = SubResource("CylinderMesh_Tank")
+material_override = SubResource("StandardMaterial3D_Tank")
